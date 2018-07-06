@@ -1,0 +1,6 @@
+{
+  "db": {
+    "uri": "mongodb://localhost/brews",
+    "dbName": "dbName"
+  }
+}
