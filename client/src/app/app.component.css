@@ -1,0 +1,18 @@
+
+.button-block, .table-block {
+  margin: auto;
+}
+
+.button-block {
+  padding: 24px;
+  width: 200px;
+}
+
+.table-block {
+  padding: 24px;
+  width: 800px;
+}
+
+button, table {
+  width: 100%;
+}
