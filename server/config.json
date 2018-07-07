@@ -1,6 +1,6 @@
 {
   "db": {
-    "uri": "mongodb://localhost/brews",
+    "uri": "mongodb://localhost/docker",
     "dbName": "dbName"
   }
 }
