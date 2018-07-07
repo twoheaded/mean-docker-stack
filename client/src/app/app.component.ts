@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {environment} from '../environments/environment';
 
 interface IData {
   host?: string,
@@ -14,14 +15,18 @@ interface IData {
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+
+  private apiPath = environment.api || 'http://localhost:3000/';
+
   data: IData[];
 
   constructor(private http: HttpClient) {
+    console.log(environment);
     this.ping();
   }
 
   ping() {
-    this.http.get<IData[]>('http://127.0.0.1:3000/')
+    this.http.get<IData[]>(this.apiPath)
       .subscribe((data: IData[]) => {
         this.data = data;
       });

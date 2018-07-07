@@ -7,7 +7,7 @@
     "build": "ng build",
     "build:ssr": "npm run build:client-and-server-bundles && npm run webpack:server",
     "serve:ssr": "node dist/server",
-    "build:client-and-server-bundles": "ng build && ng run client:server",
+    "build:client-and-server-bundles": "ng build --prod && ng run client:ssr:production",
     "webpack:server": "webpack --config webpack.server.config.js --progress --colors",
     "test": "ng test",
     "lint": "ng lint",
