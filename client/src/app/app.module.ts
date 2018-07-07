@@ -2,7 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {HttpClientModule} from '@angular/common/http';
 import {MatButtonModule} from '@angular/material';
-import {MatTableModule} from '@angular/material/table';
+import {MatCardModule} from '@angular/material/card';
 
 import {AppComponent} from './app.component';
 
@@ -11,10 +11,10 @@ import {AppComponent} from './app.component';
     AppComponent
   ],
   imports: [
-    BrowserModule,
+    BrowserModule.withServerTransition({appId: 'my-app-id'}),
     HttpClientModule,
     MatButtonModule,
-    MatTableModule
+    MatCardModule
   ],
   providers: [],
   bootstrap: [AppComponent]

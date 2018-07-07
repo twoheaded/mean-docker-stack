@@ -1,0 +1,75 @@
+
+.button-block, .table-block {
+  margin: auto;
+}
+
+.button-block {
+  padding: 24px;
+  width: 200px;
+
+  button {
+    width: 100%;
+  }
+}
+
+mat-card.table-block {
+  padding: 0;
+  width: 800px;
+
+  table {
+    border-spacing: 0;
+    width: 100%;
+
+    thead {
+
+      tr {
+        height: 56px;
+
+        th {
+          padding: 0;
+          border-bottom: 1px solid rgba(0, 0, 0, .12);
+          font-size: 12px;
+          font-weight: 500;
+          color: rgba(0, 0, 0, .54);
+          text-align: left;
+
+          &:first-child {
+            padding-left: 24px;
+          }
+
+          &:last-child {
+            padding-right: 24px;
+          }
+
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        height: 48px;
+
+        td {
+          padding: 0;
+          border-bottom: 1px solid rgba(0, 0, 0, .12);
+          font-size: 13px;
+          color: rgba(0, 0, 0, .87);
+          text-align: left;
+
+          &:first-child {
+            padding-left: 24px;
+          }
+
+          &:last-child {
+            padding-right: 24px;
+          }
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+  }
+}
