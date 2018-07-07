@@ -1,0 +1,12 @@
+debug = true
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+
+[api]
+
+[docker]
+    endpoint = "unix:///var/run/docker.sock"
+    domain = "docker-example.local"
+    watch = true
