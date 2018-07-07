@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+
+  server:
+    build: ./server
+    container_name: server
+    depends_on:
+      - db
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - "db:uri=mongodb://db/docker"
+    labels:
+      - traefik.frontend.rule=Host:api.docker-example.local
+      - traefik.port=3000
+
+
+  client:
+    build: ./client
+    container_name: client
+    depends_on:
+      - server
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    labels:
+      - traefik.frontend.rule=Host:docker-example.local
+      - traefik.port=4000
+
+  db:
+    image: mongo
+
+  reverse-proxy:
+    image: traefik
+    restart: always
+    ports:
+      - 80:80
+      - 8080:8080
+    volumes:
+      - ./proxy/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.frontend.rule=Host:monit.docker-example.local
+      - traefik.port=8080
