@@ -5,15 +5,16 @@ services:
   server:
     build: ./server
     container_name: server
+    restart: on-failure
     depends_on:
       - db
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
     environment:
       - "db:uri=mongodb://db/docker"
+    networks:
+      - traefik-net
+      - db-net
     labels:
+      - traefik.docker.network=traefik-net
       - traefik.frontend.rule=Host:api.docker-example.local
       - traefik.port=3000
 
@@ -21,18 +22,24 @@ services:
   client:
     build: ./client
     container_name: client
+    restart: on-failure
     depends_on:
       - server
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
+    networks:
+      - traefik-net
     labels:
       - traefik.frontend.rule=Host:docker-example.local
       - traefik.port=4000
 
+
   db:
     image: mongo
+    restart: on-failure
+    networks:
+      - db-net
+    labels:
+      - traefik.enable=false
+
 
   reverse-proxy:
     image: traefik
@@ -43,6 +50,16 @@ services:
     volumes:
       - ./proxy/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      traefik-net:
+        aliases:
+          - api.docker-example.local
     labels:
       - traefik.frontend.rule=Host:monit.docker-example.local
       - traefik.port=8080
+
+
+networks:
+  traefik-net:
+    external: true
+  db-net:
