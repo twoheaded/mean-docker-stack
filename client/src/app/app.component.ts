@@ -21,7 +21,6 @@ export class AppComponent {
   data: IData[];
 
   constructor(private http: HttpClient) {
-    console.log(environment);
     this.ping();
   }
 
