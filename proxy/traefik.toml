@@ -1,8 +1,10 @@
-debug = true
+debug = false
+
+defaultEntryPoints = ["http"]
 
 [entryPoints]
   [entryPoints.http]
-  address = ":80"
+    address = ":80"
 
 [api]
 
