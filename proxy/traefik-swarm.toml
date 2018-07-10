@@ -1,0 +1,14 @@
+debug = false
+
+defaultEntryPoints = ["http"]
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+
+[api]
+
+[docker]
+    swarmMode = true
+    domain = "docker-example.local"
+    watch = true
