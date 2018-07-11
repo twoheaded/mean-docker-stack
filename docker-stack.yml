@@ -1,0 +1,141 @@
+version: "3.5"
+
+services:
+
+  server:
+    image: twoheaded/public:mean-docker-server
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.docker.network=traefik-net
+        - traefik.frontend.rule=Host:api.docker-example.local
+        - traefik.port=3000
+    environment:
+      - "db:uri=mongodb://mongo0,mongo1,mongo2/docker?replicaSet=rs0"
+    networks:
+      - traefik-net
+      - db-net
+
+
+  client:
+    image: twoheaded/public:mean-docker-client
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.frontend.rule=Host:docker-example.local
+        - traefik.port=4000
+    networks:
+      - traefik-net
+
+
+  mongo0:
+    image: mongo
+    command: mongod --smallfiles --replSet rs0
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.mongo.replica == 0
+      labels:
+        - traefik.enable=false
+    networks:
+      - db-net
+
+
+  mongo1:
+    image: mongo
+    command: mongod --smallfiles --replSet rs0
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.mongo.replica == 1
+      labels:
+        - traefik.enable=false
+    networks:
+      - db-net
+
+
+  mongo2:
+    image: mongo
+    command: mongod --smallfiles --replSet rs0
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.mongo.replica == 2
+      labels:
+        - traefik.enable=false
+    networks:
+      - db-net
+
+
+  reverse-proxy:
+    image: traefik
+    command:
+      - "--api"
+      - "--entrypoints=Name:http Address::80"
+      - "--defaultentrypoints=http"
+      - "--docker"
+      - "--docker.swarmMode"
+      - "--docker.domain=docker-example.local"
+      - "--docker.watch"
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.frontend.rule=Host:monit.docker-example.local
+        - traefik.port=8080
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+      - target: 8080
+        published: 8080
+        mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      traefik-net:
+        aliases:
+          - api.docker-example.local
+
+
+  visualizer:
+    image: dockersamples/visualizer:stable
+    deploy:
+      placement:
+        constraints:
+          - node.labels.visualizer-node == 1
+      labels:
+        - traefik.frontend.rule=Host:visualizer.docker-example.local
+        - traefik.port=8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik-net
+
+
+networks:
+  traefik-net:
+    driver: overlay
+    external: true
+  db-net:
+
