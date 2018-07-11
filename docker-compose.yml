@@ -41,12 +41,18 @@ services:
 
   reverse-proxy:
     image: traefik
+    command:
+      - "--api"
+      - "--entrypoints=Name:http Address::80"
+      - "--defaultentrypoints=http"
+      - "--docker"
+      - "--docker.domain=docker-example.local"
+      - "--docker.watch"
     restart: always
     ports:
       - 80:80
       - 8080:8080
     volumes:
-      - ./proxy/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       traefik-net:
