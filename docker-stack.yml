@@ -34,7 +34,10 @@ services:
 
   mongo0:
     image: mongo
-    command: mongod --smallfiles --replSet rs0
+    command:
+      - "--smallfiles"
+      - "--replSet"
+      - "rs0"
     deploy:
       replicas: 1
       restart_policy:
@@ -50,7 +53,10 @@ services:
 
   mongo1:
     image: mongo
-    command: mongod --smallfiles --replSet rs0
+    command:
+      - "--smallfiles"
+      - "--replSet"
+      - "rs0"
     deploy:
       replicas: 1
       restart_policy:
@@ -66,7 +72,10 @@ services:
 
   mongo2:
     image: mongo
-    command: mongod --smallfiles --replSet rs0
+    command:
+      - "--smallfiles"
+      - "--replSet"
+      - "rs0"
     deploy:
       replicas: 1
       restart_policy:
@@ -138,4 +147,3 @@ networks:
     driver: overlay
     external: true
   db-net:
-
