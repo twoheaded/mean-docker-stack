@@ -8,6 +8,7 @@ services:
     depends_on:
       - db
     environment:
+      - "db:uri=mongodb://db/docker"
     networks:
       - traefik-net
       - db-net
