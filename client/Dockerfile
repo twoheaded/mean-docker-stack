@@ -21,8 +21,8 @@ FROM keymetrics/pm2:latest-alpine AS release
 
 WORKDIR /app
 
-COPY --from=build /client/dist ./dist
-COPY --from=build /client/ecosystem.config.js ./
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/ecosystem.config.js ./
 
 EXPOSE 4000
 
