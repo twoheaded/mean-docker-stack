@@ -5,15 +5,18 @@ services:
   server:
     image: twoheaded/public:mean-docker-server
     deploy:
-      replicas: 3
+      replicas: 2
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
       labels:
         - traefik.docker.network=traefik-net
         - traefik.frontend.rule=Host:api.docker-example.local
         - traefik.port=3000
     environment:
-      - "db:uri=mongodb://mongo0,mongo1,mongo2/docker?replicaSet=rs0"
+      - "db:uri=mongodb://db/docker"
     networks:
       - traefik-net
       - db-net
@@ -22,9 +25,12 @@ services:
   client:
     image: twoheaded/public:mean-docker-client
     deploy:
-      replicas: 3
+      replicas: 2
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
       labels:
         - traefik.frontend.rule=Host:docker-example.local
         - traefik.port=4000
@@ -32,57 +38,17 @@ services:
       - traefik-net
 
 
-  mongo0:
+  db:
     image: mongo
     command:
       - "--smallfiles"
-      - "--replSet"
-      - "rs0"
     deploy:
-      replicas: 1
+      mode: global
       restart_policy:
         condition: on-failure
       placement:
         constraints:
-          - node.labels.mongo.replica == 0
-      labels:
-        - traefik.enable=false
-    networks:
-      - db-net
-
-
-  mongo1:
-    image: mongo
-    command:
-      - "--smallfiles"
-      - "--replSet"
-      - "rs0"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.labels.mongo.replica == 1
-      labels:
-        - traefik.enable=false
-    networks:
-      - db-net
-
-
-  mongo2:
-    image: mongo
-    command:
-      - "--smallfiles"
-      - "--replSet"
-      - "rs0"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.labels.mongo.replica == 2
+          - node.role == manager
       labels:
         - traefik.enable=false
     networks:
@@ -113,12 +79,7 @@ services:
         - traefik.frontend.rule=Host:monit.docker-example.local
         - traefik.port=8080
     ports:
-      - target: 80
-        published: 80
-        mode: host
-      - target: 8080
-        published: 8080
-        mode: host
+      - "80:80"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
@@ -132,7 +93,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.visualizer-node == 1
+          - node.role == manager
       labels:
         - traefik.frontend.rule=Host:visualizer.docker-example.local
         - traefik.port=8080
