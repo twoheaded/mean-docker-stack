@@ -76,7 +76,7 @@ services:
       restart_policy:
         condition: on-failure
       labels:
-        - traefik.frontend.rule=Host:monit.docker-example.local
+        - traefik.frontend.rule=Host:traefik.docker-example.local
         - traefik.port=8080
     ports:
       - "80:80"
