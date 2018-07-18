@@ -4,7 +4,7 @@ const os = require('os');
 
 let Data = require('../mongoose/data-model');
 
-router.get('/', function (req, res, next) {
+router.post('/', function (req, res, next) {
 
     let newData = Data({host: os.hostname(), req_host: req.hostname, req_ip: req.header('x-real-ip')});
 

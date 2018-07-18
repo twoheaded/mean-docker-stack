@@ -1,6 +1,6 @@
 FROM node:alpine AS build
 
-WORKDIR /client
+WORKDIR /app
 
 COPY package*.json ./
 
@@ -19,10 +19,10 @@ RUN $(npm bin)/ng build --configuration=$STAGE && \
 
 FROM keymetrics/pm2:latest-alpine AS release
 
-WORKDIR /client
+WORKDIR /app
 
-COPY --from=build /client/dist ./dist
-COPY --from=build /client/ecosystem.config.js ./
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/ecosystem.config.js ./
 
 EXPOSE 4000
 

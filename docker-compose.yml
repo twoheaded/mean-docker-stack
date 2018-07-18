@@ -3,7 +3,7 @@ version: "3"
 services:
 
   server:
-    build: ./server
+    image: twoheaded/public:mean-docker-server
     restart: on-failure
     depends_on:
       - db
@@ -19,7 +19,7 @@ services:
 
 
   client:
-    build: ./client
+    image: twoheaded/public:mean-docker-client
     restart: on-failure
     depends_on:
       - server
@@ -41,19 +41,24 @@ services:
 
   reverse-proxy:
     image: traefik
+    command:
+      - "--api"
+      - "--entrypoints=Name:http Address::80"
+      - "--defaultentrypoints=http"
+      - "--docker"
+      - "--docker.domain=docker-example.local"
+      - "--docker.watch"
     restart: always
     ports:
       - 80:80
-      - 8080:8080
     volumes:
-      - ./proxy/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       traefik-net:
         aliases:
           - api.docker-example.local
     labels:
-      - traefik.frontend.rule=Host:monit.docker-example.local
+      - traefik.frontend.rule=Host:traefik.docker-example.local
       - traefik.port=8080
 
 

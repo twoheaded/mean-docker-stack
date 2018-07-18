@@ -9,16 +9,26 @@ const options = {
     pass: config.get('db:pass'),
 };
 
-mongoose.connect(config.get('db:uri'), options);
+let reconnections = 0;
 
-let connection = mongoose.connection;
+let connectWithRetry = function () {
+    return mongoose.connect(config.get('db:uri'), options)
+        .then(() => {
+            console.info("Connected to DB");
+        })
+        .catch((err) => {
+            if (reconnections < 20) {
+                reconnections++;
+                console.error(`Failed to connect to mongo on startup - retrying in ${reconnections} sec`, err);
+                setTimeout(connectWithRetry, reconnections * 1000);
+            } else {
+                console.error(`Failed to connect to mongo. Exit...`);
+                process.exit(1);
+            }
+        });
+};
 
-connection.on('error', function (err) {
-    console.error('Connection error:', err.message);
-});
+connectWithRetry();
 
-connection.once('open', function callback() {
-    console.info("Connected to DB");
-});
 
 module.exports = mongoose;

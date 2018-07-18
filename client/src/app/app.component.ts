@@ -25,7 +25,7 @@ export class AppComponent {
   }
 
   ping() {
-    this.http.get<IData[]>(this.apiPath)
+    this.http.post<IData[]>(this.apiPath, {})
       .subscribe((data: IData[]) => {
         this.data = data;
       });
