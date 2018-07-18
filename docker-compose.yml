@@ -57,7 +57,6 @@ services:
       traefik-net:
         aliases:
           - api.docker-example.local
-
     labels:
       - traefik.frontend.rule=Host:traefik.docker-example.local
       - traefik.port=8080
