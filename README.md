@@ -26,7 +26,7 @@ docker push username/repository:mean-docker-server
 docker push username/repository:mean-docker-client  
 ```
 
-## Docker Compose
+## Run using Docker Compose
 
 
 Hosts config for reverse proxy:
@@ -74,7 +74,7 @@ Stop and remove containers created by `up`:
 docker-compose down
 ```
 
-## Docker Swarm
+## Run in Docker Swarm mode
 
 ### Create machines
 
