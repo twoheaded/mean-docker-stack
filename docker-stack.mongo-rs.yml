@@ -1,0 +1,162 @@
+version: "3.5"
+
+services:
+
+  server:
+    image: twoheaded/public:mean-docker-server
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
+      labels:
+        - traefik.docker.network=traefik-net
+        - traefik.frontend.rule=Host:api.docker-example.local
+        - traefik.port=3000
+    environment:
+      - "db:uri=mongodb://mongo0,mongo1,mongo2/docker?replicaSet=rs0"
+    networks:
+      - traefik-net
+      - db-net
+
+
+  client:
+    image: twoheaded/public:mean-docker-client
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
+      labels:
+        - traefik.frontend.rule=Host:docker-example.local
+        - traefik.port=4000
+    networks:
+      - traefik-net
+
+
+  mongo0:
+    image: mongo
+    command:
+      - "--smallfiles"
+      - "--replSet"
+      - "rs0"
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.mongo.replica == 0
+      labels:
+        - traefik.enable=false
+    volumes:
+      - mongodata0:/data/db
+    networks:
+      - db-net
+
+
+  mongo1:
+    image: mongo
+    command:
+      - "--smallfiles"
+      - "--replSet"
+      - "rs0"
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.mongo.replica == 1
+      labels:
+        - traefik.enable=false
+    volumes:
+      - mongodata1:/data/db
+    networks:
+      - db-net
+
+
+  mongo2:
+    image: mongo
+    command:
+      - "--smallfiles"
+      - "--replSet"
+      - "rs0"
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.mongo.replica == 2
+      labels:
+        - traefik.enable=false
+    volumes:
+      - mongodata2:/data/db
+    networks:
+      - db-net
+
+
+  reverse-proxy:
+    image: traefik
+    command:
+      - "--api"
+      - "--entrypoints=Name:http Address::80"
+      - "--defaultentrypoints=http"
+      - "--docker"
+      - "--docker.swarmMode"
+      - "--docker.domain=docker-example.local"
+      - "--docker.watch"
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.frontend.rule=Host:traefik.docker-example.local
+        - traefik.port=8080
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      traefik-net:
+        aliases:
+          - api.docker-example.local
+
+
+  visualizer:
+    image: dockersamples/visualizer:stable
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.frontend.rule=Host:visualizer.docker-example.local
+        - traefik.port=8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik-net
+
+
+networks:
+  traefik-net:
+    driver: overlay
+    external: true
+  db-net:
+
+
+volumes:
+  mongodata0:
+  mongodata1:
+  mongodata2:
